@@ -1,87 +1,99 @@
-const express = require("express");
+// Import dependencies modules:
+const express = require('express')
+// const bodyParser = require('body-parser')
 
-const app = express(); //importing dependency module
 
-app.use(express.json());
-app.set("port", 3000);
-app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Credentials", "true");
-  res.setHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
-  res.setHeader(
-    "Access-Control-Allow-Headers",
-    "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers"
-  );
+// Create an Express.js instance:
+const app = express()
 
-  next();
-});
+// config Express.js
+app.use(express.json())
+app.set('port', 3000)
+app.use ((req,res,next) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    next();
+})
 
-//we will connect to mongodb
-const MongoClient = require("mongodb").MongoClient;
+// connect to MongoDB
+const MongoClient = require('mongodb').MongoClient;
 
 let db;
+//MongoClient.connect('mongodb+srv://MyMongoDBUser:wednesday@cluster0.epqbr.mongodb.net', (err, client) => {
+ //   db = client.db('webstore')
+//})
+MongoClient.connect('mongodb+srv://MyMongoDBUser1:wednesday@cluster0.gnktiw7.mongodb.net', (err, client) => {
+    db = client.db('Webstore')
+})
 
-MongoClient.connect(
-  "mongodb+srv://tamberohan995:rohan123@coursework.cs4lb.mongodb.net/",
-  (err, client) => {
-    db = client.db("Afterschoolclub");
-  }
-);
 
-//display a message to show that API works
-app.get("/", (req, res, next) => {
-  res.send("Select a collection, e.g., /collection/messages");
-});
+// dispaly a message for root path to show that API is working
+app.get('/', (req, res, next) => {
+    res.send('Select a collection, e.g., /collection/messages')
+})
 
-app.param("collectionName", (req, res, next, collectionName) => {
-  req.collection = db.collection(collectionName);
-  //console.log('collection name:', req.collection)
-  return next();
-});
+// get the collection name
+app.param('collectionName', (req, res, next, collectionName) => {
+    req.collection = db.collection(collectionName)
+    // console.log('collection name:', req.collection)
+    return next()
+})
 
-// retrieve all objects from the collection
-app.get("/collection/:collectionName", (req, res, next) => {
-  req.collection.find({}).toArray((e, results) => {
-    if (e) return next(e);
-    res.send(results);
-  });
-});
 
-//posting/adding a new product
-app.post("/collection/:collectionName", (req, res, next) => {
-  req.collection.insert(req.body, (e, results) => {
-    if (e) return next(e);
-    res.send(results.ops);
-  });
-});
+// retrieve all the objects from an collection
+app.get('/collection/:collectionName', (req, res, next) => {
+    req.collection.find({}).toArray((e, results) => {
+        if (e) return next(e)
+        res.send(results)
+    })
+})
 
-const ObjectID = require("mongodb").ObjectID;
-app.get("/collection/:collectionName/:id", (req, res, next) => {
-  req.collection.findOne({ _id: new ObjectID(req.params.id) }, (e, result) => {
-    if (e) return next(e);
-    res.send(result);
-  });
-});
 
-//updates the stuf and u can also add things like new
-app.put("/collection/:collectionName/:id", (req, res, next) => {
-  req.collection.update(
-    { _id: new ObjectID(req.params.id) },
-    { $set: req.body },
-    { safe: true, multi: false },
+
+//adding post
+app.post('/collection/:collectionName', (req, res, next) => {
+    req.collection.insert(req.body, (e, results) => {
+    if (e) return next(e)
+    res.send(results.ops)
+    })
+    })
+    
+    // return with object id 
+    
+    const ObjectID = require('mongodb').ObjectID;
+    app.get('/collection/:collectionName/:id'
+    , (req, res, next) => {
+    req.collection.findOne({ _id: new ObjectID(req.params.id) }, (e, result) => {
+    if (e) return next(e)
+    res.send(result)
+    })
+    })
+    
+    
+    //update an object 
+    
+    app.put('/collection/:collectionName/:id', (req, res, next) => {
+    req.collection.update(
+    {_id: new ObjectID(req.params.id)},
+    {$set: req.body},
+    {safe: true, multi: false},
     (e, result) => {
-      if (e) return next(e);
-      res.send(result.result.n === 1 ? { msg: "success" } : { msg: "error" });
-    }
-  );
-});
-
-app.delete("/collection/:collectionName/:id", (req, res, next) => {
-  req.collection.deleteOne({ _id: ObjectID(req.params.id) }, (e, result) => {
-    if (e) return next(e);
-    res.send(result.result.n === 1 ? { msg: "success" } : { msg: "error" });
-  });
-});
-
-const port = process.env.PORT || 3000;
-app.listen(port);
+    if (e) return next(e)
+    res.send((result.result.n === 1) ? {msg: 'success'} : {msg: 'error'})
+    })
+    })
+    
+    
+    
+    
+    
+    app.delete('/collection/:collectionName/:id', (req, res, next) => {
+    req.collection.deleteOne(
+    { _id: ObjectID(req.params.id) },(e, result) => {
+    if (e) return next(e)
+    res.send((result.result.n === 1) ?
+    {msg: 'success'} : {msg: 'error'})
+    })
+    })
+    
+    const port = process.env.PORT ||3000
+    app.listen(port)
