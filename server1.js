@@ -21,7 +21,7 @@ let db;
 //MongoClient.connect('mongodb+srv://MyMongoDBUser:wednesday@cluster0.epqbr.mongodb.net', (err, client) => {
  //   db = client.db('webstore')
 //})
-MongoClient.connect('mongodb+srv://MyMongoDBUser1:wednesday@cluster0.gnktiw7.mongodb.net', (err, client) => {
+MongoClient.connect('mongodb+srv://blockstree:Rars1234@cst3144.zixj3.mongodb.net/', (err, client) => {
     db = client.db('Webstore')
 })
 
