@@ -22,7 +22,7 @@ let db;
  //   db = client.db('webstore')
 //})
 MongoClient.connect('mongodb+srv://blockstree:Rars1234@cst3144.zixj3.mongodb.net/', (err, client) => {
-    db = client.db('Webstore')
+    db = client.db('webstore')
 })
 
 
